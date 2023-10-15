@@ -46,6 +46,9 @@ jobs:
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
         working-directory: ./ 
 
+      - name: Install dotnet-sonarscanner
+        run: dotnet tool install --global dotnet-sonarscanner
+        
       - name: Run SonarCloud Scanner
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
