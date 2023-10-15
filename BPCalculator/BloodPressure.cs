@@ -1,13 +1,11 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
 
 namespace BPCalculator
 {
     // BP categories
     public enum BPCategory
     {
-        [Display(Name = "Invalid")] Invalid,
         [Display(Name = "Low Blood Pressure")] Low,
         [Display(Name = "Ideal Blood Pressure")]  Ideal,
         [Display(Name = "Pre-High Blood Pressure")] PreHigh,
@@ -22,11 +20,20 @@ namespace BPCalculator
         }
         public BloodPressure(int systolic,int diastolic)
         {
-            if (systolic < SystolicMin || systolic > SystolicMax || diastolic < DiastolicMin || diastolic > DiastolicMax)
-                throw new ArgumentOutOfRangeException();
+            if (systolic < SystolicMin)
+                throw new ArgumentOutOfRangeException(nameof(systolic), "value is too low");
 
-            if(systolic < diastolic)
-                throw new ArgumentOutOfRangeException();
+            if (systolic > SystolicMax)
+                throw new ArgumentOutOfRangeException(nameof(systolic), "value is too high");
+
+            if (diastolic < DiastolicMin)
+                throw new ArgumentOutOfRangeException(nameof(diastolic), "value is too low");
+
+            if (diastolic > DiastolicMax)
+                throw new ArgumentOutOfRangeException(nameof(diastolic), "value is too high");
+
+            if (systolic <= diastolic)
+                throw new ArgumentOutOfRangeException(nameof(systolic), "value must be greater than diastolic value");
 
             Systolic = systolic;
             Diastolic = diastolic;
@@ -43,24 +50,44 @@ namespace BPCalculator
         [Range(DiastolicMin, DiastolicMax, ErrorMessage = "Invalid Diastolic Value")]
         public int Diastolic { get; set; }                      // mmHG
 
+        private bool IsHighBloodPressure()
+        {
+            return Systolic >= 140 || Diastolic >= 90;
+        }
+        private bool IsPreHighBloodPressure()
+        {
+            return (Systolic >= 120 && Systolic < 150 && Diastolic < 80) || 
+                   (Systolic < 140 && Diastolic >= 80 && Diastolic < 90);
+        }
+        private bool IsIdealBloodPressure()
+        {
+            return (Systolic >= 90 && Systolic < 120 && Diastolic < 60) ||
+                   (Systolic < 120 && Diastolic >= 60 && Diastolic < 80);
+        }
+
+        private bool IsLowBloodPressure()
+        {
+            return Systolic >= 70 && Systolic < 90 && Diastolic < 60;
+        }
+
         // calculate BP category
         public BPCategory Category
         {
             get
             {
-                if(Systolic >= 140 || Diastolic >= 90)
+                if(IsHighBloodPressure())
                     return BPCategory.High;
 
-                if (Systolic >= 120 && Systolic < 150 && Diastolic < 80 || Systolic < 140 && Diastolic >= 80 && Diastolic < 90)
+                if (IsPreHighBloodPressure())
                     return BPCategory.PreHigh;
 
-                if (Systolic >= 90 && Systolic < 120 && Diastolic < 60 || Systolic < 120 && Diastolic >= 60 && Diastolic < 80)
+                if (IsIdealBloodPressure())
                     return BPCategory.Ideal;
 
-                if (Systolic >= 70 && Systolic < 90 && Diastolic < 60)
+                if (IsLowBloodPressure())
                     return BPCategory.Low;
 
-                return BPCategory.Invalid;                    
+                throw new ArgumentOutOfRangeException(nameof(BPCategory), "Invalid Blood Pressure Category");
             }
         }
     }

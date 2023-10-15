@@ -1,5 +1,6 @@
 using BPCalculator;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 
 namespace UnitTests
 {
@@ -56,12 +57,16 @@ namespace UnitTests
             Assert.Equal(BPCategory.High, result.Category);
         }
 
-
         [Theory]
-        [InlineData(0, 0)]
+        [InlineData(80, 80)]
+        [InlineData(69, 40)]
+        [InlineData(191, 40)]
+        [InlineData(120,39)]
+        [InlineData(120,101)]
         public void ShouldThrowError(int systolic, int diastolic)
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => new BloodPressure(systolic, diastolic));
         }
+
     }
 }
