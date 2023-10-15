@@ -21,19 +21,19 @@ namespace BPCalculator
         public BloodPressure(int systolic,int diastolic)
         {
             if (systolic < SystolicMin)
-                throw new ArgumentOutOfRangeException(nameof(systolic), "value is too low");
+                throw new ArgumentOutOfRangeException(nameof(systolic), "Value is too low");
 
             if (systolic > SystolicMax)
-                throw new ArgumentOutOfRangeException(nameof(systolic), "value is too high");
+                throw new ArgumentOutOfRangeException(nameof(systolic), "Value is too high");
 
             if (diastolic < DiastolicMin)
-                throw new ArgumentOutOfRangeException(nameof(diastolic), "value is too low");
+                throw new ArgumentOutOfRangeException(nameof(diastolic), "Value is too low");
 
             if (diastolic > DiastolicMax)
-                throw new ArgumentOutOfRangeException(nameof(diastolic), "value is too high");
+                throw new ArgumentOutOfRangeException(nameof(diastolic), "Value is too high");
 
             if (systolic <= diastolic)
-                throw new ArgumentOutOfRangeException(nameof(systolic), "value must be greater than diastolic value");
+                throw new ArgumentOutOfRangeException(nameof(systolic), "Value must be greater than diastolic value");
 
             Systolic = systolic;
             Diastolic = diastolic;
@@ -87,7 +87,7 @@ namespace BPCalculator
                 if (IsLowBloodPressure())
                     return BPCategory.Low;
 
-                throw new ArgumentOutOfRangeException(nameof(BPCategory), "Invalid Blood Pressure Category");
+                throw new InvalidOperationException("No valid blood pressure category found");
             }
         }
     }
