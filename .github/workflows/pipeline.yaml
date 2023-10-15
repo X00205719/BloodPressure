@@ -54,11 +54,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
-        run: dotnet sonarscanner begin /k:"${{ secrets.SONAR_PROJECT_KEY }}" 
-            /d:sonar.host.url="https://sonarcloud.io" 
-            /d:sonar.login="${{ secrets.SONAR_TOKEN }}" 
-            /d:sonar.organization="${{ secrets.SONAR_ORGANIZATION }}" && dotnet sonarscanner end 
-            /d:sonar.login="${{ secrets.SONAR_TOKEN }}" 
+        run: |
+          dotnet sonarscanner begin /k:"${{ secrets.SONAR_PROJECT_KEY }}" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+            /o:"${{ secrets.SONAR_ORGANIZATION }}"
+          dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
         
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
