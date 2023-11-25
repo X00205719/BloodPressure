@@ -2,7 +2,7 @@ name: Build and Deploy WebApp
 
 env:
   DOTNET_VERSION: '6'
-  AZURE_WEBAPP_NAME: 'BloodPressureApplication'
+  AZURE_WEBAPP_NAME: 'inte-poc'
   AZURE_WEBAPP_PACKAGE: ${{ github.workspace }}/package
 
 on:
