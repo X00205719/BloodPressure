@@ -11,6 +11,6 @@ export const options = {
 };
 
 export default function () {
-    const res = http.get('inte-poc.azurewebsites.net');
+    const res = http.get('https://inte-poc.azurewebsites.net');
     sleep(1);
 }
