@@ -7,6 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BPCalculator", "BPCalculato
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{75305CB6-8AC0-4A40-A0DA-3169AF3FBA26}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7A02B214-7D83-427C-B202-6CE6F9ABD2D1}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\pipeline.yaml = .github\workflows\pipeline.yaml
+		.github\k6\test.js = .github\k6\test.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
