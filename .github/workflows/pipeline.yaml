@@ -46,7 +46,7 @@ jobs:
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE }}
-        working-directory: ./BloodPressure/BPCalculator
+        working-directory: ./
         
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
