@@ -3,7 +3,7 @@ name: Build and Deploy WebApp
 env:
   DOTNET_VERSION: '6'
   AZURE_WEBAPP_NAME: 'inte-poc'
-  AZURE_WEBAPP_PACKAGE: ${{ github.workspace }}
+  AZURE_WEBAPP_PACKAGE: ${{ github.workspace }}/BloodPressure/bin/Release/net6.0/publish
 
 on:
   push:
@@ -46,7 +46,7 @@ jobs:
 
       - name: dotnet publish
         run: dotnet publish -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE }}
-        working-directory: ./ 
+        working-directory: ./BloodPressure
         
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
