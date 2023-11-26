@@ -76,7 +76,7 @@ jobs:
       - name: Download K6 test file
         run: |
           mkdir k6_scripts
-          wget -O k6_scripts/test.js https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/.github/k6/performance.js
+          wget -O k6_scripts/performance.js https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/.github/k6/performance.js
 
       - name: Run k6 tests
         uses: grafana/k6-action@v0.2.0
