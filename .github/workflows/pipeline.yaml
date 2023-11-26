@@ -59,6 +59,8 @@ jobs:
     needs: build
     environment:
       name: Integration
+    env:
+      K6_BROWSER_ENABLED: true  
 
     steps:
       - name: Download artifact for deployment
