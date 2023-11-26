@@ -80,13 +80,14 @@ jobs:
           mkdir k6_scripts
           wget -O k6_scripts/performance.js https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref }}/.github/k6/performance.js
 
-      - name: Run k6 tests
-        uses: grafana/k6-action@v0.2.0
-        with:
-         filename: k6_scripts/performance.js
+      - name: Pull Docker image for k6
+        run: docker pull grafana/k6
+
+      - name: Run k6 load test, capture report
+        run: docker run -i grafana/k6 run - <k6_scripts/performance.js > k6report.txt
 
       - name: Upload Report
         uses: actions/upload-artifact@v3
         with:
-          name: k6-browser-report-summary
-          path: TestSummaryReport.html 
+          name: k6report
+          path: k6report.txt
