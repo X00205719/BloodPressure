@@ -9,6 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\Unit
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7A02B214-7D83-427C-B202-6CE6F9ABD2D1}"
 	ProjectSection(SolutionItems) = preProject
+		.github\k6\performance.js = .github\k6\performance.js
 		.github\workflows\pipeline.yaml = .github\workflows\pipeline.yaml
 	EndProjectSection
 EndProject
