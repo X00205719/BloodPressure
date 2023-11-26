@@ -81,4 +81,11 @@ jobs:
       - name: Run k6 tests
         uses: grafana/k6-action@v0.2.0
         with:
-         filename: k6_scripts/performance.js
+          script: |
+            k6 run --out json=result.json k6_scripts/performance.js
+
+      - name: Upload k6 report artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: k6-test-report
+          path: result.json
