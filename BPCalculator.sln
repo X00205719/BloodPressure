@@ -11,9 +11,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.github\k6\performance.js = .github\k6\performance.js
 		.github\workflows\pipeline.yaml = .github\workflows\pipeline.yaml
+		.github\workflows\sonarcloud.yaml = .github\workflows\sonarcloud.yaml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndToEndTests", "EndToEndTests\EndToEndTests.csproj", "{E9F66F7F-93BC-4225-B835-C86930A5839B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndToEndTests", "EndToEndTests\EndToEndTests.csproj", "{E9F66F7F-93BC-4225-B835-C86930A5839B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
