@@ -115,7 +115,7 @@ jobs:
             run: dotnet build EndToEndTests/EndToEndTests.csproj --configuration Release
 
           - name: Ensure browsers are installed
-            run: pwsh bin/Release/net6.0/playwright.ps1 install --with-deps
+            run: pwsh /home/runner/work/BloodPressure/BloodPressure/EndToEndTests/bin/Release/net6.0/playwright.ps1 install --with-deps
 
           - name: Update Playwright Settings File
             run: |
