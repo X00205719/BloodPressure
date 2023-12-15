@@ -100,7 +100,7 @@ jobs:
     steps:
           - uses: actions/checkout@v3
 
-          - name: Run Playwright E2E Tests
+          - name: Install Playwright
             run: |
               # Ensure Playwright is installed
               dotnet tool install --global Microsoft.Playwright.CLI
@@ -113,6 +113,10 @@ jobs:
 
           - name: Build EndToEndTests project
             run: dotnet build EndToEndTests/EndToEndTests.csproj --configuration Release
+
+          - name: Update Playwright Settings File
+            run: |
+              sed -i 's|"BaseUrl": "http://localhost:5000/"|"BaseUrl": "'"${{ env.AZURE_APP_SERVICE_URL }}"'"|g' EndToEndTests/playwrightSettings.json
 
           - name: Run Playwright E2E Tests
             run: |
