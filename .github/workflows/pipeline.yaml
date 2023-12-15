@@ -112,7 +112,10 @@ jobs:
 
           - name: Update Playwright Settings File
             run: |
+              echo "BaseUrl before sed: $(grep 'BaseUrl' EndToEndTests/playwrightSettings.json)"
+              echo "AZURE_APP_SERVICE_URL: $AZURE_APP_SERVICE_URL"
               sed -i 's|"BaseUrl": "http://localhost:5000/"|"BaseUrl": "'"$AZURE_APP_SERVICE_URL"'"|g' EndToEndTests/playwrightSettings.json
+              echo "BaseUrl after sed: $(grep 'BaseUrl' EndToEndTests/playwrightSettings.json)"
 
           - name: Run Playwright E2E Tests
             run: |
