@@ -97,14 +97,10 @@ jobs:
     needs: deploy_integration
     environment:
       name: Integration
+    container:
+      image: mcr.microsoft.com/playwright/dotnet:v1.40.0-jammy
     steps:
           - uses: actions/checkout@v3
-
-          - name: Install Playwright
-            run: |
-              # Ensure Playwright is installed
-              dotnet tool install --global Microsoft.Playwright.CLI
-              export PATH="$PATH:$HOME/.dotnet/tools"
           
           - name: Set up .NET Core
             uses: actions/setup-dotnet@v3
@@ -114,13 +110,12 @@ jobs:
           - name: Build EndToEndTests project
             run: dotnet build EndToEndTests/EndToEndTests.csproj --configuration Release
 
-          - name: Ensure browsers are installed
-            run: pwsh /home/runner/work/BloodPressure/BloodPressure/EndToEndTests/bin/Release/net6.0/playwright.ps1 install --with-deps
-
           - name: Update Playwright Settings File
             run: |
-              sed -i 's|"BaseUrl": "http://localhost:5000/"|"BaseUrl": "'"${{ env.AZURE_APP_SERVICE_URL }}"'"|g' EndToEndTests/playwrightSettings.json
+              sed -i 's|"BaseUrl": "http://localhost:5000/"|"BaseUrl": "'"$AZURE_APP_SERVICE_URL"'"|g' EndToEndTests/playwrightSettings.json
 
           - name: Run Playwright E2E Tests
             run: |
               dotnet test EndToEndTests/EndToEndTests.csproj
+            env:
+                HOME: /root
