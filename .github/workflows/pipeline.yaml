@@ -105,7 +105,6 @@ jobs:
               # Ensure Playwright is installed
               dotnet tool install --global Microsoft.Playwright.CLI
               export PATH="$PATH:$HOME/.dotnet/tools"
-              playwright install
           
           - name: Set up .NET Core
             uses: actions/setup-dotnet@v3
@@ -114,6 +113,9 @@ jobs:
 
           - name: Build EndToEndTests project
             run: dotnet build EndToEndTests/EndToEndTests.csproj --configuration Release
+
+          - name: Ensure browsers are installed
+            run: pwsh bin/Release/net6.0/playwright.ps1 install --with-deps
 
           - name: Update Playwright Settings File
             run: |
