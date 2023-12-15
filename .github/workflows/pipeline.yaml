@@ -111,6 +111,8 @@ jobs:
             run: dotnet build EndToEndTests/EndToEndTests.csproj --configuration Release
 
           - name: Update Playwright Settings File
+            env:
+              AZURE_APP_SERVICE_URL: ${{ secrets.AZURE_APP_SERVICE_URL }}
             run: |
               echo "BaseUrl before sed: $(grep 'BaseUrl' EndToEndTests/playwrightSettings.json)"
               echo "AZURE_APP_SERVICE_URL: $AZURE_APP_SERVICE_URL"
