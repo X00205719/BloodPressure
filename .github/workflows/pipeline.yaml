@@ -103,8 +103,11 @@ jobs:
           - name: Install Playwright
             run: |
               # Ensure Playwright is installed
-              dotnet tool install --global Microsoft.Playwright.CLI && playwright install
+              dotnet tool install --global Microsoft.Playwright.CLI
               export PATH="$PATH:$HOME/.dotnet/tools"
+
+          - name: Install required browsers
+            run: pwsh bin/Debug/netcoreapp${{ env.DOTNET_VERSION }}/playwright.ps1 install
           
           - name: Set up .NET Core
             uses: actions/setup-dotnet@v3
