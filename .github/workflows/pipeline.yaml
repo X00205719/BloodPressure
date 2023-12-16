@@ -2,8 +2,9 @@ name: Build and Deploy WebApp
 
 env:
   DOTNET_VERSION: '6'
-  AZURE_WEBAPP_NAME: 'inte-poc'
+  AZURE_WEBAPP_NAME: 'inte-bloodpressurecalculator'
   AZURE_WEBAPP_PACKAGE_PATH: '.' 
+  AZURE_WEBAPP_STAGING_SLOT: 'STAGING'
 
 on:
   push:
@@ -118,12 +119,9 @@ jobs:
 
           - name: Update Playwright Settings File
             env:
-              AZURE_APP_SERVICE_URL: ${{ secrets.AZURE_APP_SERVICE_URL }}
+              AZURE_APP_SERVICE_STAGING_URL: ${{ secrets.AZURE_APP_SERVICE_STAGING_URL }}
             run: |
-              echo "BaseUrl before sed: $(grep 'BaseUrl' EndToEndTests/playwrightSettings.json)"
-              echo "AZURE_APP_SERVICE_URL: $AZURE_APP_SERVICE_URL"
-              sed -i 's|"BaseUrl": "http://localhost:5000/"|"BaseUrl": "'"$AZURE_APP_SERVICE_URL"'"|g' EndToEndTests/playwrightSettings.json
-              echo "BaseUrl after sed: $(grep 'BaseUrl' EndToEndTests/playwrightSettings.json)"
+              sed -i 's|"BaseUrl": "http://localhost:5000/"|"BaseUrl": "'"$AZURE_APP_SERVICE_STAGING_URL"'"|g' EndToEndTests/playwrightSettings.json
 
           - name: Run Playwright E2E Tests
             run: |
@@ -131,7 +129,7 @@ jobs:
             env:
                 HOME: /root
 
-          - name: Update Traffic Routing 25%
+          - name: Update Traffic Routing 50%
             run: |
               az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-              az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n $AZURE_WEBAPP_NAME  --distribution testing=25 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+              az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} -n $AZURE_WEBAPP_NAME  --distribution testing=50 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
