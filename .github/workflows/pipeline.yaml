@@ -146,3 +146,8 @@ jobs:
           - name: Sleep for 30 seconds
             run: sleep 30s
             shell: bash
+
+          - name: Swap Azure Web App Slots
+            run: |
+              az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+              az webapp deployment slot swap --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ env.AZURE_WEBAPP_NAME }} --slot STAGING --target-slot production --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
