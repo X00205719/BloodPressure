@@ -103,6 +103,11 @@ jobs:
       image: mcr.microsoft.com/playwright/dotnet:v1.40.0-jammy
     steps:
           - uses: actions/checkout@v3
+  
+          - name: Set up Azure CLI
+            uses: azure/setup-azure-cli@v1
+            with:
+              install-cli: true
           
           - name: Set up .NET Core
             uses: actions/setup-dotnet@v3
