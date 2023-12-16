@@ -11,6 +11,6 @@ export const options = {
 };
 
 export default function () {
-    const res = http.get('http://inte-bloodpressurecalculator-staging.azurewebsites.net');
+    const res = http.get('https://inte-bloodpressurecalculator-staging.azurewebsites.net');
     sleep(1);
 }
