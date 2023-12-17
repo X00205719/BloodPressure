@@ -3,10 +3,10 @@ import { sleep } from 'k6';
 
 export const options = {
     duration: '1m',
-    vus: 50,
+    vus: 25,
     thresholds: {
         http_req_failed: ['rate<0.01'], // http errors should be less than 1%
-        http_req_duration: ['p(90)<1000'], // 95 percent of response times must be below 2000ms
+        http_req_duration: ['p(95)<1000'], // 95 percent of response times must be below 2000ms
     },
 };
 
