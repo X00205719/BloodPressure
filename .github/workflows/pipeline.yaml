@@ -94,6 +94,7 @@ jobs:
         with:
           name: k6report
           path: k6report.txt
+        if: always()
 
   execute_end_to_end:
     runs-on: ubuntu-latest
