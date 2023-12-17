@@ -154,6 +154,7 @@ jobs:
           - name: Check Application Insights for Recent Failures
             id: check-recent-failures
             run: |
+                az extension add --name application-insights
                 failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | summarize count()")
                 count=$(echo "$failures" | grep -oP '(?<="rows":\[)\[\d+\]' | grep -oP '\d+')
                 echo "::set-output name=failures::$count"
@@ -207,6 +208,7 @@ jobs:
       - name: Check Application Insights for Recent Failures
         id: check-recent-failures
         run: |
+            az extension add --name application-insights
             failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | summarize count()")
             count=$(echo "$failures" | grep -oP '(?<="rows":\[)\[\d+\]' | grep -oP '\d+')
             echo "::set-output name=failures::$count"
