@@ -35,7 +35,10 @@ namespace EndToEndTests
 
             var result = await Page.EvalOnSelectorAsync<string>("#BP_Category", "el => el.value");
 
+            var canvas = await Page.QuerySelectorAsync("canvas");
+
             Assert.AreEqual("High", result);
+            Assert.IsNotNull(canvas);
         }
     }
 }
