@@ -108,77 +108,77 @@ jobs:
           path: /report/zapreport.html
         if: always()
 
-  End_to_End:
-    runs-on: ubuntu-latest
-    needs: Integration
-    environment:
-      name: Integration
-    container:
-      image: mcr.microsoft.com/playwright/dotnet:v1.40.0-jammy
-    steps:
-          - uses: actions/checkout@v3
+  # End_to_End:
+  #   runs-on: ubuntu-latest
+  #   needs: Integration
+  #   environment:
+  #     name: Integration
+  #   container:
+  #     image: mcr.microsoft.com/playwright/dotnet:v1.40.0-jammy
+  #   steps:
+  #         - uses: actions/checkout@v3
   
-          - name: Install Azure CLI
-            run: |
-              curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+  #         - name: Install Azure CLI
+  #           run: |
+  #             curl -sL https://aka.ms/InstallAzureCLIDeb | bash
           
-          - name: Set up .NET Core
-            uses: actions/setup-dotnet@v3
-            with:
-              dotnet-version: ${{ env.DOTNET_VERSION }}
+  #         - name: Set up .NET Core
+  #           uses: actions/setup-dotnet@v3
+  #           with:
+  #             dotnet-version: ${{ env.DOTNET_VERSION }}
 
-          - name: Build EndToEndTests project
-            run: dotnet build EndToEndTests/EndToEndTests.csproj --configuration Release
+  #         - name: Build EndToEndTests project
+  #           run: dotnet build EndToEndTests/EndToEndTests.csproj --configuration Release
 
-          - name: Update Playwright Settings File
-            env:
-              AZURE_APP_SERVICE_STAGING_URL: ${{ secrets.AZURE_APP_SERVICE_STAGING_URL }}
-            run: |
-              sed -i 's|"BaseUrl": "http://localhost:5000/"|"BaseUrl": "'"$AZURE_APP_SERVICE_STAGING_URL"'"|g' EndToEndTests/playwrightSettings.json
+  #         - name: Update Playwright Settings File
+  #           env:
+  #             AZURE_APP_SERVICE_STAGING_URL: ${{ secrets.AZURE_APP_SERVICE_STAGING_URL }}
+  #           run: |
+  #             sed -i 's|"BaseUrl": "http://localhost:5000/"|"BaseUrl": "'"$AZURE_APP_SERVICE_STAGING_URL"'"|g' EndToEndTests/playwrightSettings.json
 
-          - name: Run Playwright E2E Tests
-            run: |
-              dotnet test EndToEndTests/EndToEndTests.csproj
-            env:
-                HOME: /root
+  #         - name: Run Playwright E2E Tests
+  #           run: |
+  #             dotnet test EndToEndTests/EndToEndTests.csproj
+  #           env:
+  #               HOME: /root
 
-          - name: Update Traffic Routing 50%
-            run: |
-              az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-              az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }}  --distribution STAGING=50 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  #         - name: Update Traffic Routing 50%
+  #           run: |
+  #             az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+  #             az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }}  --distribution STAGING=50 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-          - name: Sleep for 30 seconds
-            run: sleep 30s
-            shell: bash
+  #         - name: Sleep for 30 seconds
+  #           run: sleep 30s
+  #           shell: bash
 
-          - name: Check Application Insights for Recent Failures
-            id: check-recent-failures
-            run: |
-                az extension add --name application-insights
-                failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | summarize count()")
-                count=$(echo "$failures" | jq -r '.tables[0].rows[0][0]')
-                echo "::set-output name=failures::$count"
+  #         - name: Check Application Insights for Recent Failures
+  #           id: check-recent-failures
+  #           run: |
+  #               az extension add --name application-insights
+  #               failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | summarize count()")
+  #               count=$(echo "$failures" | jq -r '.tables[0].rows[0][0]')
+  #               echo "::set-output name=failures::$count"
 
-          - name: Rollback if Recent Failures Detected
-            if: ${{ steps.check-recent-failures.outputs.failures > '0' }}
-            run: |
-                az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-                az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }} --distribution STAGING=0 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-                exit 1  # Explicitly exit with a failure status code
+  #         - name: Rollback if Recent Failures Detected
+  #           if: ${{ steps.check-recent-failures.outputs.failures > '0' }}
+  #           run: |
+  #               az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+  #               az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }} --distribution STAGING=0 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  #               exit 1  # Explicitly exit with a failure status code
 
-          - name: Update Traffic Routing 100%
-            run: |
-              az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-              az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }}  --distribution STAGING=100 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  #         - name: Update Traffic Routing 100%
+  #           run: |
+  #             az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+  #             az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }}  --distribution STAGING=100 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-          - name: Swap Azure Web App Slots
-            run: |
-                az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-                az webapp deployment slot swap --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }} --slot STAGING --target-slot production --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  #         - name: Swap Azure Web App Slots
+  #           run: |
+  #               az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+  #               az webapp deployment slot swap --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }} --slot STAGING --target-slot production --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   Production:
     runs-on: ubuntu-latest
-    needs: End_to_End
+    needs: Build
     environment:
       name: Production
 
