@@ -35,7 +35,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: Test
-        run: dotnet test BPCalculator.sln --filter FullyQualifiedName~UnitTests --logger trx --results-directory "TestResults"
+        run: dotnet test BPCalculator.sln --filter "FullyQualifiedName~UnitTests|FullyQualifiedName~BDD" --logger trx --results-directory "TestResults"
 
       - name: Upload dotnet test results
         uses: actions/upload-artifact@v3
