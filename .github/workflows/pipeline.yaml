@@ -157,8 +157,8 @@ jobs:
                 failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | count")
                 echo "::set-output name=failures::$failures"
 
-          - name: Rollback to 0% if Recent Failures Detected
-            if: ${{ steps.check-recent-failures.outputs.failures != '0' }}
+          - name: Rollback if 50 Recent Failures Detected
+            if: ${{ steps.check-recent-failures.outputs.failures > '50' }}
             run: |
                 az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
                 az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }} --distribution STAGING=0 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -171,8 +171,8 @@ jobs:
 
           - name: Swap Azure Web App Slots
             run: |
-              az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
-              az webapp deployment slot swap --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }} --slot STAGING --target-slot production --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+                az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+                az webapp deployment slot swap --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }} --slot STAGING --target-slot production --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   Production:
     runs-on: ubuntu-latest
@@ -193,4 +193,36 @@ jobs:
           package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_STAGING }}
           slot-name: ${{ env.AZURE_WEBAPP_STAGING_SLOT }}
+
+      - name: Update Traffic Routing 50%
+        run: |
+            az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+            az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }}  --distribution STAGING=50 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Sleep for 30 seconds
+        run: sleep 30s
+        shell: bash
+
+      - name: Check Application Insights for Recent Failures
+        id: check-recent-failures
+        run: |
+            failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | count")
+            echo "::set-output name=failures::$failures"
+
+      - name: Rollback if 50 Recent Failures Detected
+        if: ${{ steps.check-recent-failures.outputs.failures > '50' }}
+        run: |
+            az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+            az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }} --distribution STAGING=0 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+            exit 1  # Explicitly exit with a failure status code
+
+      - name: Update Traffic Routing 100%
+        run: |
+          az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+          az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }}  --distribution STAGING=100 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Swap Azure Web App Slots
+        run: |
+          az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+          az webapp deployment slot swap --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }} --slot STAGING --target-slot production --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           
