@@ -122,10 +122,10 @@ jobs:
             run: |
               curl -sL https://aka.ms/InstallAzureCLIDeb | bash
 
-          - name: 'Setup jq'
-            uses: dcarbone/install-jq-action@v2
-            with:
-              version: '1.7'
+          - name: Install jq
+            run: |
+                apt-get update
+                apt-get install -y jq
           
           - name: Set up .NET Core
             uses: actions/setup-dotnet@v3
@@ -193,10 +193,10 @@ jobs:
         with:
           name: ${{ env.WEBAPP_NAME }}
 
-      - name: 'Setup jq'
-        uses: dcarbone/install-jq-action@v2
-        with:
-          version: '1.7'
+      - name: Install jq
+        run: |
+            apt-get update
+            apt-get install -y jq
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
