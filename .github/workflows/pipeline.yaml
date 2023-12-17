@@ -151,6 +151,13 @@ jobs:
             run: sleep 30s
             shell: bash
 
+          - name: Check Application Insights for Recent Failures
+            id: check-recent-failures
+            run: |
+                failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | count")
+                echo "::set-output name=failures::$failures"
+
+
           - name: Update Traffic Routing 100%
             run: |
               az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
