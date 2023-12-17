@@ -18,10 +18,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
   
-      - name: Install jq
-        run: |
-            sudo apt-get install -y jq
-
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v3
         with:
@@ -122,13 +118,13 @@ jobs:
     steps:
           - uses: actions/checkout@v3
   
+          - name: Install jq
+            run: |
+                apt-get install -y jq
+ 
           - name: Install Azure CLI
             run: |
               curl -sL https://aka.ms/InstallAzureCLIDeb | bash
-
-          - name: Install jq
-            run: |
-                sudo apt-get install -y jq
           
           - name: Set up .NET Core
             uses: actions/setup-dotnet@v3
@@ -191,14 +187,14 @@ jobs:
       name: Production
 
     steps:
+      - name: Install jq
+        run: |
+            sudo apt-get install -y jq
+
       - name: Download artifact for deployment
         uses: actions/download-artifact@v3
         with:
           name: ${{ env.WEBAPP_NAME }}
-
-      - name: Install jq
-        run: |
-            sudo apt-get install -y jq
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
