@@ -155,7 +155,7 @@ jobs:
             id: check-recent-failures
             run: |
                 failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | summarize count()")
-                count=$(echo "$failures" | jq '.tables[0].rows[0][0]')
+                count=$(echo "$failures" | grep -oP '(?<="rows":\[)\[\d+\]' | grep -oP '\d+')
                 echo "::set-output name=failures::$count"
 
           - name: Rollback if Recent Failures Detected
@@ -208,7 +208,7 @@ jobs:
         id: check-recent-failures
         run: |
             failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | summarize count()")
-            count=$(echo "$failures" | jq '.tables[0].rows[0][0]')
+            count=$(echo "$failures" | grep -oP '(?<="rows":\[)\[\d+\]' | grep -oP '\d+')
             echo "::set-output name=failures::$count"
 
       - name: Rollback if Recent Failures Detected
