@@ -154,11 +154,12 @@ jobs:
           - name: Check Application Insights for Recent Failures
             id: check-recent-failures
             run: |
-                failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | count")
-                echo "::set-output name=failures::$failures"
+                failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | summarize count()")
+                count=$(echo "$failures" | jq '.tables[0].rows[0][0]')
+                echo "::set-output name=failures::$count"
 
-          - name: Rollback if 50 Recent Failures Detected
-            if: ${{ steps.check-recent-failures.outputs.failures > '50' }}
+          - name: Rollback if Recent Failures Detected
+            if: ${{ steps.check-recent-failures.outputs.failures > '0' }}
             run: |
                 az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
                 az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }} --distribution STAGING=0 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -206,11 +207,12 @@ jobs:
       - name: Check Application Insights for Recent Failures
         id: check-recent-failures
         run: |
-            failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | count")
-            echo "::set-output name=failures::$failures"
+            failures=$(az monitor app-insights query --app ${{ secrets.APPLICATION_INSIGHTS_STAGING_ID }} --analytics-query "exceptions | where timestamp >= ago(1m) | summarize count()")
+            count=$(echo "$failures" | jq '.tables[0].rows[0][0]')
+            echo "::set-output name=failures::$count"
 
-      - name: Rollback if 50 Recent Failures Detected
-        if: ${{ steps.check-recent-failures.outputs.failures > '50' }}
+      - name: Rollback if Recent Failures Detected
+        if: ${{ steps.check-recent-failures.outputs.failures > '0' }}
         run: |
             az login --service-principal -u ${{ secrets.AZURE_SERVICE_PRINCIPAL }} -p ${{ secrets.AZURE_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ secrets.AZURE_TENANT_ID }}
             az webapp traffic-routing set -g ${{ secrets.AZURE_RESOURCE_GROUP }} --name ${{ vars.AZURE_WEBAPP_NAME }} --distribution STAGING=0 --subscription ${{ secrets.AZURE_SUBSCRIPTION_ID }}
